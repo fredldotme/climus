@@ -11,6 +11,10 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+    // Music player objects
+    PlaylistReader playlistReader;
+    MusicPlayer musicPlayer;
+
     // Command line parsing
     QCommandLineParser parser;
     parser.setApplicationDescription("Simple m3u music player");
@@ -22,13 +26,9 @@ int main(int argc, char *argv[])
 
     const bool playlistGiven = parser.isSet(playlistFileOption);
     if (!playlistGiven) {
-        std::cerr << "No playlist given, bailing out..." << std::endl;
+        std::cerr << "No playlist (argument -p <file>) given, bailing out..." << std::endl;
         exit(1);
     }
-
-    // Music player objects
-    PlaylistReader playlistReader;
-    MusicPlayer musicPlayer;
 
     // Connect signals to slots (loose coupling)
     // Music playlist reading
@@ -49,6 +49,9 @@ int main(int argc, char *argv[])
                      &app, [=](const QString fileName){
         std::cout << "Music stopped: " << fileName.toStdString() << std::endl;
     });
+
+    // Start reading the playlist
+    playlistReader.readPlaylist(parser.value(playlistFileOption));
 
     return app.exec();
 }
