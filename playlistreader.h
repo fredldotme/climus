@@ -3,7 +3,8 @@
 
 #include <QObject>
 #include <QString>
-#include <QVector>
+#include <QUrl>
+#include <QQueue>
 
 class PlaylistReader : public QObject
 {
@@ -11,11 +12,12 @@ class PlaylistReader : public QObject
 public:
     explicit PlaylistReader(QObject *parent = nullptr);
 
+public slots:
+    void readPlaylist(const QString& playlist);
+
 signals:
     void readError(const QString reason);
-    void playlistRead(const QVector<QString> musicList);
-
-public slots:
+    void playlistRead(QQueue<QUrl> musicList);
 };
 
 #endif // PLAYLISTREADER_H
