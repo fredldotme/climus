@@ -45,9 +45,22 @@ int main(int argc, char *argv[])
                      &app, [=](const QString fileName){
         std::cout << "Music started: " << fileName.toStdString() << std::endl;
     });
-    QObject::connect(&musicPlayer, &MusicPlayer::musicStarted,
-                     &app, [=](const QString fileName){
-        std::cout << "Music stopped: " << fileName.toStdString() << std::endl;
+    QObject::connect(&musicPlayer, &MusicPlayer::progressChanged,
+                     &app, [=](const float progressPercent) {
+        const int progressBarMaxWidth = 20;
+        const int progressBarEnd = static_cast<int>(progressBarMaxWidth *
+                                                    progressPercent);
+
+        std::cout << "[";
+        for (int i = 0; i < progressBarEnd; i++) {
+            std::cout << "#";
+        }
+        for (int i = 0; i < progressBarMaxWidth - progressBarEnd; i++) {
+            std::cout << " ";
+        }
+        std::cout << "]";
+        std::cout << "\r";
+        std::cout.flush();
     });
 
     // Start reading the playlist

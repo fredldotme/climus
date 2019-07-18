@@ -4,23 +4,28 @@ MusicPlayer::MusicPlayer(QObject *parent) : QObject(parent)
 {
     this->m_internalPlayer.setPlaylist(&this->m_playlist);
 
-    QObject::connect(&this->m_internalPlayer, &QMediaPlayer::stateChanged,
-                     this, [=](QMediaPlayer::State state) {
-
-        const QString filePath =
-                this->m_playlist.currentMedia().canonicalUrl().toLocalFile();
-
-        switch (state) {
-        case QMediaPlayer::State::PlayingState:
-            emit musicStarted(filePath);
-            break;
-        case QMediaPlayer::State::StoppedState:
-            emit musicStopped(filePath);
-            break;
-        default:
-            break;
-        }
+    QObject::connect(&this->m_playlist, &QMediaPlaylist::currentMediaChanged,
+                     this, [=](){
+        emit musicStarted(getCurrentFile());
     });
+
+    QObject::connect(&this->m_internalPlayer, &QMediaPlayer::positionChanged,
+                     this, [=](qint64 position) {
+        if (this->m_internalPlayer.state() != QMediaPlayer::PlayingState) {
+            return;
+        }
+        const qint64 duration = this->m_internalPlayer.duration();
+        const float progressPercent = (static_cast<float>(position) /
+                                       static_cast<float>(duration));
+        emit progressChanged(progressPercent);
+    });
+}
+
+const QString MusicPlayer::getCurrentFile()
+{
+    const QString filePath =
+            this->m_playlist.currentMedia().canonicalUrl().toLocalFile();
+    return filePath;
 }
 
 void MusicPlayer::enqueueNewPlaylist(QQueue<QUrl> musicList)
