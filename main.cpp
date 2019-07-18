@@ -6,6 +6,7 @@
 
 #include "musicplayer.h"
 #include "playlistreader.h"
+#include "progressoutput.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +15,7 @@ int main(int argc, char *argv[])
     // Music player objects
     PlaylistReader playlistReader;
     MusicPlayer musicPlayer;
+    ProgressOutput progressOutput;
 
     // Command line parsing
     QCommandLineParser parser;
@@ -46,22 +48,7 @@ int main(int argc, char *argv[])
         std::cout << "Music started: " << fileName.toStdString() << std::endl;
     });
     QObject::connect(&musicPlayer, &MusicPlayer::progressChanged,
-                     &app, [=](const float progressPercent) {
-        const int progressBarMaxWidth = 20;
-        const int progressBarEnd = static_cast<int>(progressBarMaxWidth *
-                                                    progressPercent);
-
-        std::cout << "[";
-        for (int i = 0; i < progressBarEnd; i++) {
-            std::cout << "#";
-        }
-        for (int i = 0; i < progressBarMaxWidth - progressBarEnd; i++) {
-            std::cout << " ";
-        }
-        std::cout << "]";
-        std::cout << "\r";
-        std::cout.flush();
-    });
+                     &progressOutput, &ProgressOutput::handleProgressChange);
 
     // Start reading the playlist
     playlistReader.readPlaylist(parser.value(playlistFileOption));

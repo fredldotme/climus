@@ -18,7 +18,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         musicplayer.cpp \
-        playlistreader.cpp
+        playlistreader.cpp \
+        progressoutput.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -27,4 +28,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     musicplayer.h \
-    playlistreader.h
+    playlistreader.h \
+    progressoutput.h
