@@ -14,11 +14,12 @@ void ProgressOutput::handleProgressChange(const float progressPercent)
                                                 progressPercent);
 
     std::cout << "[";
-    for (int i = 0; i < progressBarEnd; i++) {
-        std::cout << "#";
-    }
-    for (int i = 0; i < progressBarMaxWidth - progressBarEnd; i++) {
-        std::cout << " ";
+    for (int i = 0; i < progressBarMaxWidth; i++) {
+        if (i < progressBarEnd) {
+            std::cout << "#";
+        } else {
+            std::cout << " ";
+        }
     }
     std::cout << "]";
     std::cout << "\r";
