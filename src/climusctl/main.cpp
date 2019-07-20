@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <QDBusInterface>
+#include <QDBusReply>
 
 #include "daemonconsts.h"
 
@@ -19,7 +20,15 @@ int main(int argc, char *argv[])
                                     CLIMUSD_SERVICE_PATH,
                                     CLIMUSD_SERVICE_INTERFACE);
 
-    serviceInterface.call(QStringLiteral("readPlaylist"),
-                          QString::fromUtf8(filePath, strlen(filePath)));
+    QDBusReply<void> reply =
+            serviceInterface.call(QStringLiteral("readPlaylist"),
+                                  QString::fromUtf8(filePath, static_cast<int>(strlen(filePath))));
+
+    if (!reply.isValid()) {
+        std::cerr << "Reply is invalid, reason: "
+                  << reply.error().message().toStdString() << std::endl;
+        exit(2);
+    }
+
     return 0;
 }
