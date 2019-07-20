@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
     QObject::connect(&playlistReader, &PlaylistReader::readError,
                      &app, [=](const QString reason) {
         std::cerr << "Playlist read error: " << reason.toStdString() << std::endl;
-        exit(2);
+        if (!daemonMode)
+            exit(2);
     });
     QObject::connect(&playlistReader, &PlaylistReader::playlistRead,
                      &musicPlayer, &MusicPlayer::enqueueNewPlaylist);
