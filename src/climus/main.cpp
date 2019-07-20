@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
         // As the object is registered now, connect serviceInterface with the playlistReader
         QObject::connect(serviceInterface, &IPCServiceInterface::playlistReadRequest,
                          &playlistReader, &PlaylistReader::readPlaylist);
+    } else {
+        std::cerr << "Neither -p <file> nor -d specified, bailing out" << std::endl;
+        exit(3);
     }
 
     return app.exec();
