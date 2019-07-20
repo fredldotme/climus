@@ -7,7 +7,6 @@
 #include <QQueue>
 #include <QString>
 #include <QUrl>
-#include <QVector>
 
 class MusicPlayer : public QObject
 {
