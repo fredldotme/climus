@@ -6,7 +6,11 @@ MusicPlayer::MusicPlayer(QObject *parent) : QObject(parent)
 
     QObject::connect(&this->m_playlist, &QMediaPlaylist::currentMediaChanged,
                      this, [=](){
-        emit musicStarted(getCurrentFile());
+        const QString currentFile = getCurrentFile();
+        if (currentFile.isEmpty())
+            return;
+
+        emit musicStarted(currentFile);
     });
 
     QObject::connect(&this->m_internalPlayer, &QMediaPlayer::positionChanged,
