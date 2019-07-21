@@ -2,7 +2,7 @@
 #include <QDBusInterface>
 #include <QDBusReply>
 
-#include "daemonconsts.h"
+#include "commonconsts.h"
 
 #include <iostream>
 

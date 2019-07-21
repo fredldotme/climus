@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include <daemonconsts.h>
+#include <commonconsts.h>
 #include "ipcserviceinterface.h"
 #include "musicplayer.h"
 #include "playlistreader.h"
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
                      &app, [=](const QString reason) {
         std::cerr << "Playlist read error: " << reason.toStdString() << std::endl;
         if (!daemonMode)
-            exit(2);
+            exit(Climus::ExitCodes::EXIT_FAILURE_PLAYLIST_READ_ERROR);
     });
     QObject::connect(&playlistReader, &PlaylistReader::playlistRead,
                      &musicPlayer, &MusicPlayer::enqueueNewPlaylist);
@@ -53,16 +53,23 @@ int main(int argc, char *argv[])
     QObject::connect(&musicPlayer, &MusicPlayer::progressChanged,
                      &progressOutput, &ProgressOutput::handleProgressChange);
 
+    if (!(playlistGiven || daemonMode)) {
+        std::cerr << "Neither -p <file> nor -d specified, bailing out" << std::endl;
+        exit(Climus::ExitCodes::EXIT_FAILURE_NO_ARGUMENT);
+    }
+
     if (playlistGiven) {
         // Start reading the playlist
         playlistReader.readPlaylist(parser.value(playlistFileOption));
 
-    } else if (daemonMode) {
+    }
+
+    if (daemonMode) {
         const bool serviceUp = QDBusConnection::sessionBus().registerService(CLIMUSD_SERVICE_NAME);
         if (!serviceUp) {
             std::cerr << "Service " << CLIMUSD_SERVICE_NAME.toStdString() <<
                          " couldn't be registered, exiting" << std::endl;
-            exit(1);
+            exit(Climus::ExitCodes::EXIT_FAILURE_SERVICE_REGISTRATION);
         }
 
         // The object exposed via the DBus IPC mechanism
@@ -74,15 +81,12 @@ int main(int argc, char *argv[])
         if (!objectRegistered) {
             std::cerr << "Failed to register object at path " <<
                          CLIMUSD_SERVICE_PATH.toStdString() << std::endl;
-            exit(2);
+            exit(Climus::ExitCodes::EXIT_FAILURE_OBJECT_REGISTRATION);
         }
 
         // As the object is registered now, connect serviceInterface with the playlistReader
         QObject::connect(serviceInterface, &IPCServiceInterface::playlistReadRequest,
                          &playlistReader, &PlaylistReader::readPlaylist);
-    } else {
-        std::cerr << "Neither -p <file> nor -d specified, bailing out" << std::endl;
-        exit(3);
     }
 
     return app.exec();

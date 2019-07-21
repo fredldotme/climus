@@ -2,7 +2,7 @@
 #define IPCSERVICEINTERFACE_H
 
 #include <QObject>
-#include <daemonconsts.h>
+#include <commonconsts.h>
 
 class IPCServiceInterface : public QObject
 {

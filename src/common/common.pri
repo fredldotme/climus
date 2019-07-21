@@ -1,4 +1,4 @@
 HEADERS += \
-    $$PWD/daemonconsts.h
+    $$PWD/commonconsts.h
 
 INCLUDEPATH += $$PWD
